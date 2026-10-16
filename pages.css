@@ -1,0 +1,105 @@
+/* Page tabs, photo strips and the Nilai Kinerja Organisasi page.
+   Predikat scale is diverging: blue = above standard, gray = Cukup, orange-red = below. */
+:root {
+  --p-istimewa: #1f5fa8;
+  --p-baik: #6f9fd3;
+  --p-cukup: #a3acb5;
+  --p-kurang: #e39a63;
+  --p-sangat-kurang: #c2492b;
+  --low-tint: #e8743b;
+  --avg-line: #13212d;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --p-istimewa: #6fb1f2; --p-baik: #3f78ad; --p-cukup: #5d6873; --p-kurang: #b8693a; --p-sangat-kurang: #f07a52;
+    --low-tint: #f08a52; --avg-line: #e5ecf2;
+  }
+}
+:root[data-theme="dark"] {
+  --p-istimewa: #6fb1f2; --p-baik: #3f78ad; --p-cukup: #5d6873; --p-kurang: #b8693a; --p-sangat-kurang: #f07a52;
+  --low-tint: #f08a52; --avg-line: #e5ecf2;
+}
+
+/* Which page is showing */
+body[data-page="monev"] [data-for="nko"],
+body[data-page="nko"] [data-for="monev"] { display: none !important; }
+
+/* Tabs in the hero */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--hero-line);
+  color: var(--hero-fg); text-decoration: none; font-weight: 600; font-size: 14px; background: rgba(255,255,255,.05); }
+.tab:hover { background: rgba(255,255,255,.12); }
+.tab[aria-selected="true"] { background: var(--hero-fg); color: var(--hero-bg); border-color: var(--hero-fg); }
+.tab .tab-no { font-family: var(--font-display); font-stretch: 85%; font-size: 12px; opacity: .7; }
+
+/* Photo strips */
+.photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.photo { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: grid; grid-template-rows: auto 1fr; min-width: 0; }
+.photo img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; max-width: 100%; }
+.photo figcaption { padding: 9px 12px 11px; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.photo figcaption b { display: block; color: var(--fg); font-weight: 600; font-size: 13px; }
+.photos.feature { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+
+/* Predikat chips */
+.pred { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  color: var(--fg); white-space: nowrap; }
+.pred::before { content: ""; width: 9px; height: 9px; border-radius: 3px; background: var(--pc, var(--p-cukup)); flex: none; }
+.pred[data-p="ISTIMEWA"] { --pc: var(--p-istimewa); }
+.pred[data-p="BAIK"] { --pc: var(--p-baik); }
+.pred[data-p="CUKUP"] { --pc: var(--p-cukup); }
+.pred[data-p="KURANG"] { --pc: var(--p-kurang); }
+.pred[data-p="SANGAT KURANG"] { --pc: var(--p-sangat-kurang); }
+.pred.big { font-size: 13px; }
+
+.mv { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mv.up::before { content: "▲ "; font-size: .8em; }
+.mv.down::before { content: "▼ "; font-size: .8em; }
+.mv.same { color: var(--muted); font-weight: 600; }
+
+/* Distribution bar */
+.dist { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; margin-top: 6px; background: var(--soft); }
+.dist span { display: block; height: 100%; }
+.dist-legend { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.dist-legend b { color: var(--fg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi-name { font-weight: 700; font-size: 15px; line-height: 1.3; }
+
+/* Profile card */
+.profile { display: grid; gap: 12px; align-content: start; }
+.profile-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: start; }
+.profile-head h3 { font-size: 16px; }
+.profile-score { text-align: right; }
+.profile-score .score-num { font-family: var(--font-display); font-stretch: 85%; font-weight: 650; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.profile-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+.profile-meta b { color: var(--fg); }
+.aspects { display: grid; gap: 8px; }
+.aspect { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; font-size: 13px; }
+.aspect .a-name { font-weight: 600; }
+.aspect .a-name small { color: var(--muted); font-weight: 500; }
+.aspect .a-val { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.aspect .a-bar { grid-column: 1 / -1; height: 7px; border-radius: 4px; background: var(--soft); overflow: hidden; }
+.aspect .a-bar span { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.aspect .a-note { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+.evaluasi { background: var(--soft); border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.55; }
+.evaluasi h4 { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.evaluasi p { margin: 0; white-space: pre-line; }
+
+/* NKO table */
+td.heat { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600;
+  background: color-mix(in srgb, var(--low-tint) var(--h, 0%), transparent); }
+.nko-row { cursor: pointer; }
+.nko-row:hover td:not(.heat) { background: var(--soft); }
+.nko-row.sel td { box-shadow: inset 0 -2px 0 var(--accent); }
+.rank { font-family: var(--font-display); font-stretch: 85%; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+
+/* Averages table */
+.avg-table { font-size: 13px; }
+.avg-table td, .avg-table th { padding: 7px 10px; }
+.avg-table th { position: static; }
+.avg-table td:first-child { font-weight: 600; }
+
+.select-unit { width: 100%; }
+.select-unit select { flex: 1 1 auto; min-width: 0; width: 100%; }
+
+@media (max-width: 720px) {
+  .profile-score .score-num { font-size: 28px; }
+}
