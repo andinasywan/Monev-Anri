@@ -1,22 +1,22 @@
 /* Page tabs, photo strips and the Nilai Kinerja Organisasi page.
-   Predikat scale is diverging: blue = above standard, gray = Cukup, orange-red = below. */
+   Predikat scale: blue = above standard, gray = Cukup, yellow = Kurang, red-orange = Sangat kurang. */
 :root {
   --p-istimewa: #1f5fa8;
   --p-baik: #6f9fd3;
   --p-cukup: #a3acb5;
-  --p-kurang: #e39a63;
+  --p-kurang: #e8b51e;
   --p-sangat-kurang: #c2492b;
   --low-tint: #e8743b;
   --avg-line: #13212d;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --p-istimewa: #6fb1f2; --p-baik: #3f78ad; --p-cukup: #5d6873; --p-kurang: #b8693a; --p-sangat-kurang: #f07a52;
+    --p-istimewa: #6fb1f2; --p-baik: #3f78ad; --p-cukup: #5d6873; --p-kurang: #e0b43a; --p-sangat-kurang: #f07a52;
     --low-tint: #f08a52; --avg-line: #e5ecf2;
   }
 }
 :root[data-theme="dark"] {
-  --p-istimewa: #6fb1f2; --p-baik: #3f78ad; --p-cukup: #5d6873; --p-kurang: #b8693a; --p-sangat-kurang: #f07a52;
+  --p-istimewa: #6fb1f2; --p-baik: #3f78ad; --p-cukup: #5d6873; --p-kurang: #e0b43a; --p-sangat-kurang: #f07a52;
   --low-tint: #f08a52; --avg-line: #e5ecf2;
 }
 
