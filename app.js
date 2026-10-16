@@ -2,7 +2,7 @@
   "use strict";
   const PAGES = {
     monev: { title: "Monev Renja ANRI 2026", redraw: () => window.MONEV_PAGE && window.MONEV_PAGE.redraw() },
-    nko: { title: "Nilai Kinerja Organisasi 2026", redraw: () => window.NKO_PAGE && window.NKO_PAGE.redraw() },
+    nko: { title: "Penilaian Kinerja Organisasi 2026", redraw: () => window.NKO_PAGE && window.NKO_PAGE.redraw() },
   };
 
   function show(name) {

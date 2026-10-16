@@ -33,24 +33,22 @@
 
   // ---------- formatting ----------
   const idn = (v, d) => v.toLocaleString("id-ID", { minimumFractionDigits: d, maximumFractionDigits: d });
+  // Amounts are shown in full (no M / jt abbreviations), as the team asked.
   function rp(v) {
-    if (!isNum(v)) return "–";
-    const a = Math.abs(v);
-    if (a >= 1e12) return "Rp " + idn(v / 1e12, 2) + " T";
-    if (a >= 1e9) return "Rp " + idn(v / 1e9, 2) + " M";
-    if (a >= 1e6) return "Rp " + idn(v / 1e6, 1) + " jt";
-    return "Rp " + idn(v, 0);
+    return isNum(v) ? "Rp " + idn(v, 0) : "–";
   }
   const rpFull = (v) => (isNum(v) ? "Rp " + idn(v, 0) : "–");
   const pct = (v, d = 1) => (isNum(v) ? idn(v * 100, d) + "%" : "–");
   const qty = (v) => (isNum(v) ? v.toLocaleString("id-ID", { maximumFractionDigits: 2 }) : "–");
   function axisRp(v) {
-    if (v === 0) return "0";
-    const f = (x) => idn(x, x % 1 ? 1 : 0);
-    if (v >= 1e12) return f(v / 1e12) + " T";
-    if (v >= 1e9) return f(v / 1e9) + " M";
-    return f(v / 1e6) + " jt";
+    return idn(v, 0);
   }
+  // sort choices shared by the unit and RO tables: [column, 1 = low to high, -1 = high to low]
+  const SORTS = {
+    "fisik-tinggi": ["pct_fisik", -1], fisik: ["pct_fisik", 1],
+    "anggaran-tinggi": ["pct_sp2d", -1], anggaran: ["pct_sp2d", 1],
+    pagu: ["pagu_aktif", -1],
+  };
   // ascending (dir 1) or descending (dir -1); rows without a value go last
   function sortRows(rows, key, dir) {
     return rows.slice().sort((a, b) => {
@@ -178,7 +176,9 @@
   function kpi(label, value, sub, opts = {}) {
     const k = el("div", "kpi");
     k.appendChild(el("div", "kpi-label", label));
-    const v = el("div", "kpi-value", value);
+    const v = el("div", "kpi-value" + (opts.money ? " money" : ""));
+    if (opts.money && value.startsWith("Rp ")) v.append(el("span", "cur", "Rp"), value.slice(3));
+    else v.textContent = value;
     if (opts.title) v.title = opts.title;
     k.appendChild(v);
     if (sub) k.appendChild(sub);
@@ -205,7 +205,7 @@
     const ps = prevSheet(state.sheet), pt = ps && totalOf(ps);
     const bln = BULAN[m.no - 1];
 
-    box.appendChild(kpi("Pagu aktif", rp(t.pagu_aktif), sub(["Pagu DIPA ", el("b", null, rp(t.pagu_dipa))]), { title: rpFull(t.pagu_aktif) }));
+    box.appendChild(kpi("Pagu aktif", rp(t.pagu_aktif), sub(["Pagu DIPA ", el("b", null, rp(t.pagu_dipa))]), { money: true }));
 
     const parts = [el("b", null, rp(t.sp2d_sd)), " dari pagu aktif"];
     if (pt && isNum(pt.pct_sp2d)) {
@@ -218,7 +218,7 @@
 
     if (isNum(t.pagu_aktif) && isNum(t.sp2d_sd)) {
       const sisa = t.pagu_aktif - t.sp2d_sd;
-      box.appendChild(kpi("Sisa pagu belum SP2D", rp(sisa), sub([el("b", null, pct(sisa / t.pagu_aktif)), " dari pagu aktif"]), { title: rpFull(sisa) }));
+      box.appendChild(kpi("Sisa pagu belum SP2D", rp(sisa), sub([el("b", null, pct(sisa / t.pagu_aktif)), " dari pagu aktif"]), { money: true }));
     }
 
     const ro = roRows(state.sheet).filter((r) => isNum(r.pct_fisik));
@@ -364,9 +364,10 @@
       bars.push({ p, path, isSel });
     });
     const sel = vals.find((p) => p && p.sheet === state.sheet);
-    if (sel) {
-      const lx = Math.max(m.l + 20, Math.min(m.l + (sel.i + 0.5) * band, m.l + iw - 20));
-      svg.appendChild(svgEl("text", { x: lx, y: y(sel.v) - 7, "text-anchor": "middle", class: "lbl-strong" }, rp(sel.v).replace("Rp ", "")));
+    const selLabel = $("#bulanan-val");
+    if (selLabel) {
+      selLabel.replaceChildren();
+      if (sel) selLabel.append(BULAN[sel.i] + " " + year + ": ", el("b", null, rp(sel.v)));
     }
     const hit = svgEl("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
     svg.appendChild(hit);
@@ -379,7 +380,7 @@
       const p = vals[i];
       if (!p) { hideTip(box); return; }
       const k = rr.width / W;
-      showTip(box, (m.l + (i + 0.5) * band) * k, y(p.v) * k, BULAN[i] + " " + year, [{ label: "SP2D bulan ini", value: rp(p.v) }], rpFull(p.v));
+      showTip(box, (m.l + (i + 0.5) * band) * k, y(p.v) * k, BULAN[i] + " " + year, [{ label: "SP2D bulan ini", value: rp(p.v) }]);
     };
     hit.addEventListener("pointermove", move);
     hit.addEventListener("pointerdown", move);
@@ -512,8 +513,8 @@
       const loose = units.filter((u) => !groups.some((g) => g.name === u.kelompok));
       loose.forEach((u) => tb.appendChild(unitTr(u)));
     } else {
-      const key = { anggaran: "pct_sp2d", fisik: "pct_fisik", pagu: "pagu_aktif" }[state.unitSort];
-      sortRows(units, key, state.unitSort === "pagu" ? -1 : 1).forEach((u) => tb.appendChild(unitTr(u)));
+      const [key, dir] = SORTS[state.unitSort] || SORTS.pagu;
+      sortRows(units, key, dir).forEach((u) => tb.appendChild(unitTr(u)));
     }
   }
 
@@ -533,8 +534,8 @@
     let rows = all.filter((r) => (!state.unit || r.unit === state.unit) &&
       (!q || [r.kode, r.uraian, r.satuan, r.unit, r.catatan].some((s) => s && String(s).toLowerCase().includes(q))));
     if (state.roSort !== "sheet") {
-      const key = { anggaran: "pct_sp2d", fisik: "pct_fisik", pagu: "pagu_aktif" }[state.roSort];
-      rows = sortRows(rows, key, state.roSort === "pagu" ? -1 : 1);
+      const [key, dir] = SORTS[state.roSort] || SORTS.pagu;
+      rows = sortRows(rows, key, dir);
     }
     $("#ro-count").textContent = rows.length === all.length ? all.length + " RO" : "Menampilkan " + rows.length + " dari " + all.length + " RO";
     if (!rows.length) {

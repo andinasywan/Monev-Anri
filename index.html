@@ -26,7 +26,7 @@
     </div>
     <nav class="tabs" role="tablist" aria-label="Halaman dashboard">
       <a class="tab" role="tab" id="tab-monev" href="#monev" aria-controls="page-monev" aria-selected="true"><span class="tab-no">01</span>Monev Renja</a>
-      <a class="tab" role="tab" id="tab-nko" href="#nko" aria-controls="page-nko" aria-selected="false"><span class="tab-no">02</span>Nilai Kinerja Organisasi</a>
+      <a class="tab" role="tab" id="tab-nko" href="#nko" aria-controls="page-nko" aria-selected="false"><span class="tab-no">02</span>Penilaian Kinerja Organisasi</a>
     </nav>
     <p class="hero-sub" style="margin:0" data-for="monev">Realisasi anggaran dan capaian fisik per bulan, dari matriks monitoring dan evaluasi rencana kerja.</p>
     <p class="hero-sub" style="margin:0" data-for="nko">Nilai kinerja setiap unit kerja per triwulan: kinerja anggaran, laporan kinerja, pengisian e-Monev, dan revisi POK.</p>
@@ -64,7 +64,8 @@
         </div>
         <div class="card">
           <h3>Realisasi SP2D per bulan</h3>
-          <p class="note">Pencairan yang terjadi di bulan itu saja, bukan kumulatif</p>
+          <p class="note">Pencairan yang terjadi di bulan itu saja, bukan kumulatif. Sumbu dalam rupiah.</p>
+          <p class="note" id="bulanan-val"></p>
           <div class="chart" id="chart-bulanan"></div>
         </div>
       </div>
@@ -108,7 +109,9 @@
         <label class="field" for="unit-urut">Urutkan
           <select id="unit-urut">
             <option value="sheet">Per kelompok (urutan sheet)</option>
+            <option value="anggaran-tinggi">Serapan SP2D tertinggi</option>
             <option value="anggaran">Serapan SP2D terendah</option>
+            <option value="fisik-tinggi">Capaian fisik tertinggi</option>
             <option value="fisik">Capaian fisik terendah</option>
             <option value="pagu">Pagu aktif terbesar</option>
           </select>
@@ -145,7 +148,9 @@
         <label class="field" for="ro-urut">Urutkan
           <select id="ro-urut">
             <option value="sheet">Urutan sheet</option>
+            <option value="fisik-tinggi">Capaian fisik tertinggi</option>
             <option value="fisik">Capaian fisik terendah</option>
+            <option value="anggaran-tinggi">Serapan SP2D tertinggi</option>
             <option value="anggaran">Serapan SP2D terendah</option>
             <option value="pagu">Pagu aktif terbesar</option>
           </select>
@@ -278,7 +283,7 @@
   <div class="inner gutter">
     <p id="sumber" data-for="monev">Sumber: Matriks Monev Renja Tahun 2026, satu sheet per bulan. Data disalin otomatis secara berkala; kolom yang khusus untuk internal tidak ditampilkan.</p>
     <p id="stamp" data-for="monev"></p>
-    <p data-for="nko">Sumber: rekap penilaian Nilai Kinerja Organisasi 2026 dan lembar penilaian tiap unit kerja. Data disalin otomatis secara berkala.</p>
+    <p data-for="nko">Sumber: rekap Penilaian Kinerja Organisasi 2026 dan lembar penilaian tiap unit kerja. Data disalin otomatis secara berkala.</p>
     <p id="nko-stamp" data-for="nko"></p>
   </div>
 </footer>
