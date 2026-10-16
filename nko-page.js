@@ -40,6 +40,12 @@
   };
   const predByValue = (v) => (isNum(v) ? BANDS.find(([min]) => v >= min)[1] : "");
   const rec = (u, tw) => (u.tw && u.tw[tw]) || null;
+  // Aspect bars follow the aspect's own category: Sangat Baik blue, Baik green, Cukup yellow, Kurang and Sangat Kurang red.
+  const ASPEK_COLOR = {
+    "SANGAT BAIK": "var(--p-istimewa)", BAIK: "var(--p-baik)", CUKUP: "var(--p-cukup)",
+    KURANG: "var(--p-sangat-kurang)", "SANGAT KURANG": "var(--p-sangat-kurang)",
+  };
+  const aspekColor = (kat) => ASPEK_COLOR[String(kat || "").toUpperCase().trim()] || "var(--accent)";
   function prevTw(tw) {
     const i = quarters.findIndex((q) => q.tw === tw);
     return i > 0 ? quarters[i - 1].tw : null;
@@ -404,7 +410,7 @@
       if (d && isNum(d.bobot)) name.appendChild(el("small", null, " · bobot " + idn(d.bobot * 100, 0) + "%"));
       const bar = el("div", "a-bar"); const s = el("span");
       s.style.width = (isNum(v) ? Math.max(0, Math.min(v, 100)) : 0) + "%";
-      s.style.background = isNum(v) && v < 60 ? "var(--p-sangat-kurang)" : "var(--accent)";
+      s.style.background = aspekColor(r[k + "_kat"]);
       bar.appendChild(s);
       row.append(name, el("div", "a-val", n2(v)), bar);
       const notes = [];
