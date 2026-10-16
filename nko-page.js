@@ -40,12 +40,6 @@
   };
   const predByValue = (v) => (isNum(v) ? BANDS.find(([min]) => v >= min)[1] : "");
   const rec = (u, tw) => (u.tw && u.tw[tw]) || null;
-  // Aspect bars follow the aspect's own category: Sangat Baik blue, Baik green, Cukup yellow, Kurang and Sangat Kurang red.
-  const ASPEK_COLOR = {
-    "SANGAT BAIK": "var(--p-istimewa)", BAIK: "var(--p-baik)", CUKUP: "var(--p-cukup)",
-    KURANG: "var(--p-sangat-kurang)", "SANGAT KURANG": "var(--p-sangat-kurang)",
-  };
-  const aspekColor = (kat) => ASPEK_COLOR[String(kat || "").toUpperCase().trim()] || "var(--accent)";
   function prevTw(tw) {
     const i = quarters.findIndex((q) => q.tw === tw);
     return i > 0 ? quarters[i - 1].tw : null;
@@ -377,6 +371,50 @@
     hit.addEventListener("pointerleave", () => hideTip(box));
   }
 
+  // Per-unit table across all quarters (Komponen x TW I-IV), selected quarter highlighted.
+  function profileTable(u) {
+    const box = el("div", "table-box prof-box");
+    const t = el("table", "prof-table");
+    const thead = el("thead"); const hr = el("tr");
+    hr.appendChild(el("th", null, "Komponen"));
+    for (const q of D.quarters) hr.appendChild(el("th", "r" + (q.tw === state.tw ? " sel" : ""), "TW " + q.tw));
+    thead.appendChild(hr); t.appendChild(thead);
+    const tb = el("tbody");
+    const addRow = (label, fill, cls) => {
+      const tr = el("tr", cls || "");
+      tr.appendChild(el("td", "k", label));
+      for (const q of D.quarters) {
+        const r = rec(u, q.tw);
+        const td = el("td", "r" + (q.tw === state.tw ? " sel" : ""));
+        if (!r) td.textContent = "–"; else fill(td, r, q.tw);
+        tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    };
+    for (const [k, label] of [["ka", "Kinerja anggaran"], ["lk", "Lap. kinerja"], ["em", "e-Monev"], ["pok", "Revisi POK"]]) {
+      addRow(label, (td, r) => { td.textContent = n2(r[k]); });
+    }
+    addRow("Total NKO", (td, r) => { td.textContent = n2(r.total); }, "tot");
+    addRow("Kategori", (td, r) => {
+      const p = predOf(r);
+      td.textContent = p || "–";
+      td.classList.add("kat");
+      td.dataset.p = p;
+    });
+    addRow("Peringkat", (td, r) => { td.textContent = isNum(r.peringkat) ? String(r.peringkat) : "–"; });
+    addRow("Perubahan peringkat", (td, r, tw) => { td.appendChild(moveEl(rankMove(u, tw))); });
+    t.appendChild(tb);
+    box.appendChild(t);
+    return box;
+  }
+
+  function bobotNote(u) {
+    const d = u.detail;
+    if (!d || d.aspek.length !== 4) return "";
+    const names = ["kinerja anggaran", "laporan kinerja", "e-Monev", "revisi POK"];
+    return "Bobot Triwulan " + d.triwulan + ": " + d.aspek.map((a, i) => names[i] + " " + idn(a.bobot * 100, 0) + "%").join(", ") + ".";
+  }
+
   function renderProfile() {
     const body = $("#nko-profile-body");
     body.replaceChildren();
@@ -400,26 +438,9 @@
     head.append(left, right);
     body.appendChild(head);
 
-    const detail = u.detail && u.detail.triwulan === state.tw ? u.detail : null;
-    const aspects = el("div", "aspects");
-    ASPEK.forEach(([k, label], idx) => {
-      const v = r[k];
-      const row = el("div", "aspect");
-      const name = el("div", "a-name", label);
-      const d = detail && detail.aspek[idx];
-      if (d && isNum(d.bobot)) name.appendChild(el("small", null, " · bobot " + idn(d.bobot * 100, 0) + "%"));
-      const bar = el("div", "a-bar"); const s = el("span");
-      s.style.width = (isNum(v) ? Math.max(0, Math.min(v, 100)) : 0) + "%";
-      s.style.background = aspekColor(r[k + "_kat"]);
-      bar.appendChild(s);
-      row.append(name, el("div", "a-val", n2(v)), bar);
-      const notes = [];
-      if (r[k + "_kat"]) notes.push(r[k + "_kat"]);
-      if (d && d.isian !== "" && d.isian != null && k !== "ka") notes.push(k === "pok" ? "jumlah revisi " + d.isian : String(d.isian));
-      if (notes.length) row.appendChild(el("div", "a-note", notes.join(" · ")));
-      aspects.appendChild(row);
-    });
-    body.appendChild(aspects);
+    body.appendChild(profileTable(u));
+    const bobot = bobotNote(u);
+    if (bobot) body.appendChild(el("p", "note", bobot));
 
     const trendHead = el("div", "legend");
     const a1 = el("span"); const k1 = el("span", "key"); k1.style.background = "var(--accent)"; a1.append(k1, "Unit ini");

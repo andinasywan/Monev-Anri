@@ -8,16 +8,21 @@
   --p-sangat-kurang: #e5322d;
   --low-tint: #e8743b;
   --avg-line: #13212d;
+  --up: #1e8e3e;
+  --down: #d93025;
+  --head-bg: #0a2338;
+  --sel-head: #b8900a;
+  --sel-cell: #fff5cc;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --p-istimewa: #2b8fe0; --p-baik: #92d050; --p-cukup: #ffe500; --p-kurang: #ed7d31; --p-sangat-kurang: #f04a40;
-    --low-tint: #f08a52; --avg-line: #e5ecf2;
+    --low-tint: #f08a52; --avg-line: #e5ecf2; --up: #5fd38a; --down: #ff7a6e; --head-bg: #06192a; --sel-head: #b8900a; --sel-cell: rgba(255, 229, 0, .12);
   }
 }
 :root[data-theme="dark"] {
   --p-istimewa: #2b8fe0; --p-baik: #92d050; --p-cukup: #ffe500; --p-kurang: #ed7d31; --p-sangat-kurang: #f04a40;
-  --low-tint: #f08a52; --avg-line: #e5ecf2;
+  --low-tint: #f08a52; --avg-line: #e5ecf2; --up: #5fd38a; --down: #ff7a6e; --head-bg: #06192a; --sel-head: #b8900a; --sel-cell: rgba(255, 229, 0, .12);
 }
 
 /* Which page is showing */
@@ -55,6 +60,8 @@ body[data-page="nko"] [data-for="monev"] { display: none !important; }
 .mv.up::before { content: "▲ "; font-size: .8em; }
 .mv.down::before { content: "▼ "; font-size: .8em; }
 .mv.same { color: var(--muted); font-weight: 600; }
+.mv.up { color: var(--up); }
+.mv.down { color: var(--down); }
 
 /* Distribution bar */
 .dist { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; margin-top: 6px; background: var(--soft); }
@@ -103,3 +110,20 @@ td.heat { text-align: right; font-variant-numeric: tabular-nums; white-space: no
 @media (max-width: 720px) {
   .profile-score .score-num { font-size: 28px; }
 }
+
+/* Profile table: components x quarters */
+.prof-box { max-height: none; }
+.prof-table { font-size: 13px; }
+.prof-table th { position: static; background: var(--head-bg); color: #fff; text-align: center; padding: 9px 10px; border-bottom: 0; }
+.prof-table th:first-child { text-align: left; }
+.prof-table th.sel { background: var(--sel-head); }
+.prof-table td { padding: 7px 10px; text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.prof-table td.k { text-align: left; font-weight: 600; background: var(--soft); white-space: normal; }
+.prof-table td.sel { background: var(--sel-cell); font-weight: 700; }
+.prof-table tr.tot td { font-weight: 800; }
+.prof-table td.kat { font-weight: 800; letter-spacing: .03em; font-size: 12px; }
+.prof-table td.kat[data-p="ISTIMEWA"] { background: var(--p-istimewa); color: #fff; }
+.prof-table td.kat[data-p="BAIK"] { background: var(--p-baik); color: #13212d; }
+.prof-table td.kat[data-p="CUKUP"] { background: var(--p-cukup); color: #13212d; }
+.prof-table td.kat[data-p="KURANG"] { background: var(--p-kurang); color: #13212d; }
+.prof-table td.kat[data-p="SANGAT KURANG"] { background: var(--p-sangat-kurang); color: #fff; }
